@@ -1,0 +1,18 @@
+-rwsr-x---+ 1 level1 users  747441 Mar  6  2016 level0
+
+Decompiled on snowman (see source file)
+
+if (!reinterpret_cast<int1_t>(eax4 == 0x1a7)) {
+-> 0x1a7 = 423
+
+→ The program checks if 1st argument = 423
+If it's the case, execute /bin/sh with level1 uid
+
+level0@RainFall:~$ ./level0 423
+$ whoami
+level1
+$ cd ../level1
+$ cat .pass
+1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a
+
+Flag: 1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a
