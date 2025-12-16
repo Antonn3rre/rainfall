@@ -1,0 +1,11 @@
+void run(void) {
+    fwrite("Good... Wait what?\n");
+    system("/bin/sh");
+    return;
+}
+
+void main() {
+    char local_50[76];
+    gets(local_50);
+    return;
+}

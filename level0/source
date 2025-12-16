@@ -1,0 +1,18 @@
+int main(int argc, char **argv) {
+
+    int num;
+    char **tab;
+
+    num = atoi(argv[1]);
+    if (num != 0x1a7) {
+        fwrite("No !\n", 1, 5, stdder);
+    } else {
+        tab[0] = strdup("/bin/sh");
+        gid_t gid = getegid();
+        uid_t uid = geteuid();
+        setresgid(gid);
+        setresuid(uid);
+        execv("/bin/sh", tab);
+    }
+    return 0;
+}

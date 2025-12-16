@@ -1,0 +1,20 @@
+void p(char *a0) { printf(a0); return; }
+
+void n()
+{
+    int m;
+    char v0[520];
+
+    fgets(&v0, 0x200);
+    p(&v0);
+    if (m != 16930116)
+        return;
+    system("/bin/cat /home/user/level5/.pass");
+    return;
+}
+
+void main()
+{
+    n();
+    return;
+}

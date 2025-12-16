@@ -1,0 +1,19 @@
+void v(void)
+{
+    int m;
+    char local_20c [520];
+  
+    fgets(local_20c, 0x200);
+    printf(local_20c);
+    if (m == 0x40) {
+        fwrite("Wait what?!\n");
+        system("/bin/sh");
+    }
+    return;
+}
+
+void main(void)
+{
+  v();
+  return;
+}
