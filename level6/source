@@ -1,0 +1,23 @@
+int n()
+{
+    return system("/bin/cat /home/user/level7/.pass");
+}
+
+int m()
+{
+    puts("Nope");
+    return;
+}
+
+void main(int argc, char **argv)
+{
+    char *str;
+    void (*func)(void);
+
+    str = malloc(64);
+    func = malloc(4);
+    func = &m;
+    strcpy(str, argv[1]);
+    func();
+    return 0;
+}

