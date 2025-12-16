@@ -1,0 +1,19 @@
+void o()
+{
+    system("/bin/sh");
+    exit(1);
+}
+
+void n()
+{
+    char v0[520];
+
+    fgets(&v0, 0x200); // 512 in decimal
+    printf(&v0);
+    exit(1);
+}
+
+void main()
+{
+    n();
+}

