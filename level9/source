@@ -1,0 +1,31 @@
+class N {
+    char *string;
+
+    N(int number) {
+        this->number = number;
+    }
+
+    int operator+(N &arg) {
+		return this->number + arg.number;
+	}
+
+	void setAnnotation(char *str) {
+		size_t len;
+		memcpy(this->string, str, len);
+		return;
+	}
+}
+
+int main(int argc,char **argv) {
+	N N1;
+	N N2;
+
+	if (argc < 2) {
+		exit(1);
+	}
+	N1 = new N(5);
+	N2 = new N(6);
+	N1->setAnnotation(argv[1]);
+
+	return N2.operator+(&N1);;
+}
