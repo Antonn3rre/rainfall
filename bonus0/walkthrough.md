@@ -31,6 +31,8 @@ Pour exploiter cette vulnérabilité, nous avons besoin de :
 
 > **Pourquoi utiliser un shellcode ?** Nos buffers font seulement **20** octets. Pour une attaque ret2libc, il faudrait au minimum **12** octets, mais nous n'en avons que **11** disponibles. Le shellcode est donc notre seule option.
 
+shellcode source : https://0xrick.github.io/binary-exploitation/bof5/
+
 ## Étape 1 : Préparer le shellcode
 
 ```shell
